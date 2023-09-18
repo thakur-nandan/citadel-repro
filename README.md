@@ -47,7 +47,7 @@ pip install ujson
 
 ## 1. Script to convert BEIR dataset in CITADEL.
 
-- Run [convert_beir_to_dpr.sh](/convert_beir_to_dpr.sh) script. Change paths accordingly. 
+- Run [0.convert_beir_to_dpr.sh](/0.convert_beir_to_dpr.sh) script. Change paths accordingly. 
 
 You can also change the `citadel_scripts/convert_beir_to_dpr_format.py` to convert the dataset logic accordingly.
 ```
@@ -66,7 +66,7 @@ done
 
 1. Make sure you have the CITADEL+ checkpoint downloaded.
 
-- Run [evaluate_beir_whole_script.sh](/evaluate_beir_whole_script.sh) script. Change paths accordingly. 
+- Run [1-4.evaluate_beir_whole_script.sh](/1-4.evaluate_beir_whole_script.sh) script. Change paths accordingly. 
 
 
 # OLD README.md
