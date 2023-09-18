@@ -1,4 +1,78 @@
-# CITADEL:  Conditional Token Interaction via Dynamic Lexical Routing for Efficient and Effective Multi-Vector Retrieval
+# CITADEL Reproduction
+
+This repository contains the reproduction of CITADEL and CITADEL+ using [dpr-scale](https://github.com/facebookresearch/dpr-scale/tree/citadel) repository.
+
+Make sure you install the dependencies as mentioned below here for Basilisk with CUDA 11.6.
+
+## Dependencies
+First, make sure you have [Anaconda3](https://docs.anaconda.com/anaconda/install/index.html) installed.
+Then use conda to create a new environment and activate it:
+```
+conda create -n dpr-scale python=3.8
+conda activate dpr-scale
+```
+Now let's install the packages. First, follow the instructions [here](https://pytorch.org/get-started/locally/) to install PyTorch on your machine.
+Then install faiss:
+```
+conda install -c conda-forge faiss-gpu
+```
+
+Install Pytorch 1.12.1 and hydra core and other utils.
+```
+# CUDA 11.6
+pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
+pip install hydra-core==1.1.0
+pip install hydra-submitit-launcher==1.2.0
+```
+
+Install Cython and other utils.
+```
+cd dpr_scale/retriever_ext
+pip install Cython
+python setup.py build_ext --inplace
+```
+
+Install torch scatter (compatible with pytorch 1.12.1 and CUDA 11.6) and pytrec_eval for beir evaluation.
+```
+pip install pytorch-lightning==1.6.4
+pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.1%2Bcu116.html
+pip install pytrec_eval
+pip install fairscale==0.4.6
+pip install transformers==3.4.0
+pip install sentence_splitter>=1.4
+pip install pyyaml
+pip install tqdm
+pip install ujson
+```
+
+## 1. Script to convert BEIR dataset in CITADEL.
+
+- Run [convert_beir_to_dpr.sh](/convert_beir_to_dpr.sh) script. Change paths accordingly. 
+
+You can also change the `citadel_scripts/convert_beir_to_dpr_format.py` to convert the dataset logic accordingly.
+```
+DATASET=(webis-touche2020)
+
+for dataset in ${DATASET[*]}
+do
+    echo $dataset
+    output_path=/store2/scratch/n3thakur/dpr-scale/experiments/data/$dataset
+    dataset_path=/store2/scratch/n3thakur/touche-ablations/beir-datasets-touche-d2q/
+    python /store2/scratch/n3thakur/dpr-scale/dpr_scale/citadel_scripts/convert_beir_to_dpr_format.py $dataset_path $output_path
+done
+```
+
+## 2. Run CITADEL+ EVALUTION script for BEIR evaluation.
+
+1. Make sure you have the CITADEL+ checkpoint downloaded.
+
+- Run [evaluate_beir_whole_script.sh](/convert_beir_to_dpr.sh) script. Change paths accordingly. 
+
+
+# OLD README.md
+---------------
+
+## CITADEL:  Conditional Token Interaction via Dynamic Lexical Routing for Efficient and Effective Multi-Vector Retrieval
 
 This page describes how to implement [CITADEL](https://arxiv.org/abs/2211.10411) with dpr-scale.
 ```
