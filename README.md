@@ -2,7 +2,7 @@
 
 This repository contains the reproduction of CITADEL and CITADEL+ using [dpr-scale](https://github.com/facebookresearch/dpr-scale/tree/citadel) repository.
 
-Make sure you install the dependencies as mentioned below here for Basilisk with CUDA 11.6.
+Make sure you install the dependencies as mentioned below here to reproduce for a GPU system with Python 3.8, Pytorch 1.12.1 and CUDA 11.6.
 
 ## Dependencies
 First, make sure you have [Anaconda3](https://docs.anaconda.com/anaconda/install/index.html) installed.
