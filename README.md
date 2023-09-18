@@ -35,7 +35,7 @@ python setup.py build_ext --inplace
 Install torch scatter (compatible with pytorch 1.12.1 and CUDA 11.6) and pytrec_eval for beir evaluation.
 ```
 pip install pytorch-lightning==1.6.4
-pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.1%2Bcu116.html
+pip install --verbose --no-index torch-scatter -f https://data.pyg.org/whl/torch-1.12.1%2Bcu116.html
 pip install pytrec_eval
 pip install fairscale==0.4.6
 pip install transformers==3.4.0
