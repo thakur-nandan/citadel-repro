@@ -66,7 +66,7 @@ done
 
 1. Make sure you have the CITADEL+ checkpoint downloaded.
 
-- Run [evaluate_beir_whole_script.sh](/convert_beir_to_dpr.sh) script. Change paths accordingly. 
+- Run [evaluate_beir_whole_script.sh](/evaluate_beir_whole_script.sh) script. Change paths accordingly. 
 
 
 # OLD README.md
