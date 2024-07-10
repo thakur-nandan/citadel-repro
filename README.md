@@ -1,8 +1,18 @@
 # CITADEL Reproduction
 
 This repository contains the reproduction of CITADEL and CITADEL+ using [dpr-scale](https://github.com/facebookresearch/dpr-scale/tree/citadel) repository.
-
 Make sure you install the dependencies as mentioned below here to reproduce for a GPU system with Python 3.8, Pytorch 1.12.1 and CUDA 11.6.
+
+Used for reproducing CITADEL+ work in Systematic Evaluation on Touché-2020 which is accepted at SIGIR 2024 (Reproduction Track).
+```
+@INPROCEEDINGS{Thakur_etal_SIGIR2024,
+   author = "Nandan Thakur and Luiz Bonifacio and Maik {Fr\"{o}be} and Alexander Bondarenko and Ehsan Kamalloo and Martin Potthast and Matthias Hagen and Jimmy Lin",
+   title = "Systematic Evaluation of Neural Retrieval Models on the {Touch\'{e}} 2020 Argument Retrieval Subset of {BEIR}",
+   booktitle = "Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+   year = 2024,
+   address_ = "Washington, D.C."
+}
+```
 
 ## Dependencies
 First, make sure you have [Anaconda3](https://docs.anaconda.com/anaconda/install/index.html) installed.
@@ -45,28 +55,33 @@ pip install tqdm
 pip install ujson
 ```
 
-## 1. Script to convert BEIR dataset in CITADEL.
+## End-to-End CITADEL Evaluation Script
 
-- Run [0.convert_beir_to_dpr.sh](/0.convert_beir_to_dpr.sh) script. Change paths accordingly. 
+### 1. Convert BEIR dataset into DPR format
+- Run [0.convert_beir_to_dpr.sh](/scripts/step-by-step/0.convert_beir_to_dpr.sh) script. Change paths accordingly. 
 
 You can also change the `citadel_scripts/convert_beir_to_dpr_format.py` to convert the dataset logic accordingly.
-```
-DATASET=(webis-touche2020)
+
+```bash
+DATASET=(webis-touche2020-v3)
 
 for dataset in ${DATASET[*]}
 do
     echo $dataset
-    output_path=/store2/scratch/n3thakur/dpr-scale/experiments/data/$dataset
-    dataset_path=/store2/scratch/n3thakur/touche-ablations/beir-datasets-touche-d2q/
-    python /store2/scratch/n3thakur/dpr-scale/dpr_scale/citadel_scripts/convert_beir_to_dpr_format.py $dataset_path $output_path
+    output_path=data/$dataset  # Output path whether the DPR-formatted dataset will be downloaded
+    dataset_path=data/$dataset-beir  # download the BEIR dataset and provide the path here
+    python dpr-scale/dpr_scale/citadel_scripts/convert_beir_to_dpr_format.py $dataset_path $output_path
 done
 ```
 
-## 2. Run CITADEL+ EVALUTION script for BEIR evaluation.
+### 2. Run CITADEL+ BEIR evaluation
 
-1. Make sure you have the CITADEL+ checkpoint downloaded.
-
-- Run [1-4.evaluate_beir_whole_script.sh](/1-4.evaluate_beir_whole_script.sh) script. Change paths accordingly. 
+- Make sure you have the CITADEL+ model checkpoint downloaded; Checkout [checkpoints](#checkpoints).
+- Run [evaluate_end_to_end.sh](/scripts/step-by-step/evaluate_end_to_end.sh) script. Change paths accordingly. 
+  - Generate corpus embeddings: Use the CITADEL+ model to generate corpus embeddings for the BEIR dataset
+  - Merge corpus embeddings: We merge all the generated corpus embeddings within a single file for easy inference.
+  - Evaluate BEIR retrieval: Use the CITADEL+ model to generate query embeddings for the BEIR dataset and retrieve top-k similar embeddings.
+  - Evaluate BEIR scores: Finally use BEIR eval tools to score or evaluate the retrieved documents.
 
 
 # OLD README.md
