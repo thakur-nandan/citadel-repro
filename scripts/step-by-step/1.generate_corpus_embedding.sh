@@ -1,11 +1,21 @@
-export CUDA_VISIBLE_DEVICES=3
-CHECKPOINT_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/checkpoints/citadel_plus_checkpoint_best.ckpt
-DATASET=(nfcorpus)
+# Generate the corpus embeddings for the BEIR dataset using the CITADEL+ model.
+
+export CUDA_VISIBLE_DEVICES=0
+
+# Download the checkpoint
+# check if the checkpoint exists
+mkdir -p checkpoints/
+wget https://dl.fbaipublicfiles.com/citadel/checkpoints/citadel/citadel_plus/checkpoint_best.ckpt -P checkpoints/
+
+# Set the checkpoint path
+CHECKPOINT_PATH=checkpoints/checkpoint_best.ckpt
+
+DATASET=(webis-touche2020-v3)
 for dataset in ${DATASET[*]} 
 do
     echo $dataset
-    CTX_EMBEDDINGS_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/corpus_embeddings/
-    DATA_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/datasets/${dataset}/dpr-scale/corpus.tsv
+    CTX_EMBEDDINGS_DIR=output/${dataset}/corpus_embeddings/
+    DATA_PATH=datasets/${dataset}/dpr-scale/corpus.tsv
 
     HYDRA_FULL_ERROR=1 PYTHONPATH=.:$PYTHONPATH nohup python dpr_scale/citadel_scripts/generate_multivec_embeddings.py -m --config-name msmarco_aws.yaml \
     datamodule=generate \

@@ -1,11 +1,28 @@
+# Description: Evaluate the end-to-end CITADEL+ pipeline for the BEIR Dataset
+# Can be used to encode and search using multiple GPUs.
+# Usage: bash evaluate_end_to_end.sh
+# Requirements: CITADEL+ model checkpoint, BEIR Dataset, and the CITADEL+ model codebase.
+
 export CUDA_VISIBLE_DEVICES=4,5,6,7
-DATASET=(webis-touche2020-fff-touche-d2q-wo-title-original-annotations)
+
+# BEIR Dataset
+DATASET=(webis-touche2020-v3)
 
 # Model Checkpoint path
-CHECKPOINT_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/checkpoints/citadel_plus_checkpoint_best.ckpt
+CHECKPOINT_PATH=checkpoints/citadel_plus_checkpoint_best.ckpt
 
 # Data directory
-DATA_DIR=/store2/scratch/n3thakur/touche-ablations/beir-datasets-touche-d2q
+DATA_DIR=data/$DATASET
+
+#### STEP 0: Convert BEIR Dataset to DPR format ####
+for dataset in ${DATASET[*]}
+do
+    echo $dataset
+    mkdir -p data/$dataset
+    output_path=data/$dataset
+    dataset_path=data/$dataset-beir
+    python dpr_scale/citadel_scripts/convert_beir_to_dpr_format.py $dataset_path $output_path
+done
 
 # BEIR Dataset paths
 for dataset in ${DATASET[*]}
@@ -15,11 +32,11 @@ do
     PATH_TO_QUERIES_TSV=$DATA_DIR/dpr-scale/queries.tsv
 done
 
-# Generate Corpus Embeddings for the BEIR Dataset
+#### Step 1: Generate Corpus Embeddings for the BEIR Dataset ####
 for dataset in ${DATASET[*]} 
 do
     echo $dataset
-    CTX_EMBEDDINGS_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/corpus_embeddings/
+    CTX_EMBEDDINGS_DIR=output/${dataset}/corpus_embeddings/
     DATA_PATH=$DATA_DIR/dpr-scale/corpus.tsv
 
     HYDRA_FULL_ERROR=1 PYTHONPATH=.:$PYTHONPATH python dpr_scale/citadel_scripts/generate_multivec_embeddings.py -m --config-name msmarco_aws.yaml \
@@ -38,20 +55,20 @@ do
 done
 
 
-# Merge corpus embeddings for the BEIR Dataset
+#### Step 2: Merge corpus embeddings for the BEIR Dataset ####
 for dataset in ${DATASET[*]} 
 do
     echo $dataset
-    OUTPUT_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/merged_embeddings/
-    CTX_EMBEDDINGS_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/corpus_embeddings/
+    OUTPUT_DIR=output/${dataset}/merged_embeddings/
+    CTX_EMBEDDINGS_DIR=output/${dataset}/corpus_embeddings/
     PYTHONPATH=.:$PYTHONPATH python dpr_scale/citadel_scripts/merge_experts.py $OUTPUT_DIR "$CTX_EMBEDDINGS_DIR" "0-31000"
 done
 
-# Evaluate the BEIR Dataset using the merged embeddings
+# Step 3: Evaluate the BEIR Dataset using the merged embeddings ####
 for dataset in ${DATASET[*]}
 do
-    OUTPUT_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/retrieval
-    MERGED_EMBEDDINGS_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/merged_embeddings/expert
+    OUTPUT_DIR=output/${dataset}/retrieval
+    MERGED_EMBEDDINGS_DIR=output/${dataset}/merged_embeddings/expert
 done
 
 PORTION=1.0  #0.001 # how much portion of the index should be moved to GPU before retrieval
@@ -75,11 +92,11 @@ task.model.cls_projection_dim=128 +task.add_cls=True task.shared_model=True \
 trainer=gpu_1_host trainer.gpus=4
 
 
-# Evaluate the BEIR Dataset using the merged embeddings -- get scores from TREC file
+#### Step 4: Evaluate the BEIR Dataset using the merged embeddings -- get scores from TREC file ####
 for dataset in ${DATASET[*]} 
 do
     echo $dataset
     QRELS_PATH=$DATA_DIR/dpr-scale/test.tsv
-    TREC_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/retrieval/retrieval.trec
-    python dpr_scale/citadel_scripts/run_beir_eval.py $QRELS_PATH $TREC_PATH > /store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/retrieval/eval_results.txt
+    TREC_PATH=output/${dataset}/retrieval/retrieval.trec
+    python dpr_scale/citadel_scripts/run_beir_eval.py $QRELS_PATH $TREC_PATH > output/${dataset}/retrieval/eval_results.txt
 done

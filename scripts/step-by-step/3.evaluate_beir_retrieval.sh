@@ -1,12 +1,15 @@
-export CUDA_VISIBLE_DEVICES=3
-export dataset=nfcorpus
-OUTPUT_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/retrieval
-CTX_EMBEDDINGS_DIR=/store2/scratch/n3thakur/dpr-scale/experiments/output/${dataset}/merged_embeddings/expert
-CHECKPOINT_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/checkpoints/citadel_plus_checkpoint_best.ckpt
+# This script encodes the query embeddings and does the search using the corpus embeddings.
 
-I2D_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/datasets/${dataset}/dpr-scale/index2docid.tsv
-DATA_PATH=/store2/scratch/n3thakur/dpr-scale/experiments/datasets/${dataset}/dpr-scale/corpus.tsv
-PATH_TO_QUERIES_TSV=/store2/scratch/n3thakur/dpr-scale/experiments/datasets/${dataset}/dpr-scale/queries.tsv
+export CUDA_VISIBLE_DEVICES=0
+
+export dataset=webis-touche2020-v3
+OUTPUT_DIR=output/${dataset}/retrieval
+CTX_EMBEDDINGS_DIR=output/${dataset}/merged_embeddings/expert
+CHECKPOINT_PATH=checkpoints/checkpoint_best.ckpt
+
+I2D_PATH=datasets/${dataset}/dpr-scale/index2docid.tsv
+DATA_PATH=datasets/${dataset}/dpr-scale/corpus.tsv
+PATH_TO_QUERIES_TSV=datasets/${dataset}/dpr-scale/queries.tsv
 
 PORTION=1.0  #0.001 # how much portion of the index should be moved to GPU before retrieval
 
